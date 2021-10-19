@@ -1,5 +1,5 @@
 const tmp = require('tmp-promise')
-const dht = require('@hyperswarm/dht')
+const DHT = require('@hyperswarm/dht')
 const HyperspaceClient = require('../../client')
 const HyperspaceServer = require('../../server')
 
@@ -34,19 +34,26 @@ async function createMany (numDaemons, opts) {
   const servers = []
   const dirs = []
 
-  const bootstrapper = dht({
+  /*
+  const bootstrapper = new DHT({
     bootstrap: false
   })
   bootstrapper.listen()
   await new Promise(resolve => {
     return bootstrapper.once('listening', resolve)
   })
-  const bootstrapPort = bootstrapper.address().port
-  const bootstrapOpt = [`localhost:${bootstrapPort}`]
+  */
 
+  /*
+  const bootstrapper = DHT.bootstrapper(0, { ephemeral: true, bootstrap: [] })
+  await bootstrapper.ready()
+  const addr = bootstrapper.address()
+  const bootstrapOpt = [{ host: 'localhost', port: addr.port }]
+  */
+  const bootstrapOpt = undefined
   for (let i = 0; i < numDaemons; i++) {
     const serverOpts = opts ? Array.isArray(opts) ? opts[i] : opts : null
-    const { server, client, cleanup, dir } = await createOne({ ...serverOpts, bootstrap: bootstrapOpt, host: 'hyperspace-' + i })
+    const { server, client, cleanup, dir } = await createOne({ ...serverOpts,  bootstrap: bootstrapOpt, host: 'hyperspace-' + i })
     cleanups.push(cleanup)
     servers.push(server)
     clients.push(client)
